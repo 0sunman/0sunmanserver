@@ -22,3 +22,15 @@ jobs:
       # nodeJs를 설치합니다.
       - name: 노드 설치
         uses: actions/setup-node@v1
+
+      # package.json의 dependencies 설치
+      - name: 프로젝트 디펜던시 설치
+        run: yarn
+
+      # 프로젝트를 빌드합니다.
+      - name: 프로젝트 빌드하기
+        run: yarn build
+
+      # 빌드 파일이 생성되었는지 확인합니다.
+      - name: 빌드 파일 생성 체크
+        run: ls -la

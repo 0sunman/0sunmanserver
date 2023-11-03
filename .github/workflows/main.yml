@@ -53,9 +53,9 @@ jobs:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{env.LIGHTSAIL_USERNAME}}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          source: 'dist/*'
+          source: '*'
           strip_components: 1
-          target: '/home/ec2-user/0sunmanserver/dist'
+          target: '/home/ec2-user/0sunmanserver/'
       
       - name: Restart PM2 process
         uses: appleboy/ssh-action@master

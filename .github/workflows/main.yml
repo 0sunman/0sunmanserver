@@ -9,7 +9,7 @@ on:
 env:
   LIGHTSAIL_SSH_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
   LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
-  LIGHTSAIL_USERNAME: 0sunman
+  LIGHTSAIL_USERNAME: ec2-user
   AWS_REGION: ap-northeast-2
 
 jobs:
@@ -59,7 +59,7 @@ jobs:
 
       # 배포 자동화를 시작합니다.
       - name: 배포 자동화
-        uses: appleboy/scp-action@v0.1.3
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{env.LIGHTSAIL_USERNAME}}

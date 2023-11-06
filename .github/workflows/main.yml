@@ -42,6 +42,17 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+      # 빌드 파일이 생성되었는지 확인합니다.
+      - name: 빌드 파일 생성 체크2
+        run: ls dist
+
+      - name: AWS 인증하기
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}    
+
       # AWS 인증이 완료되었는지 테스트합니다.
       - name: AWS Lightsail에 연결되었는지 확인
         run: aws configure list
@@ -53,9 +64,9 @@ jobs:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{env.LIGHTSAIL_USERNAME}}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          source: '*'
+          source: './dist/*'
           strip_components: 1
-          target: '/home/ec2-user/0sunmanserver/'
+          target: '/home/ec2-user/0sunmanserver/dist'
           debug: true
           proxy_timeout: 300s
           timeout: 300s

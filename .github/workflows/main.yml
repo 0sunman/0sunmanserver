@@ -53,6 +53,21 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}    
 
+      - name: Get Github Actions IP
+        id: ip
+        uses: haythem/public-ip@v1.2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Add Github Actions IP to Security group
+        run: |
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+
       # AWS 인증이 완료되었는지 테스트합니다.
       - name: AWS Lightsail에 연결되었는지 확인
         run: aws configure list
@@ -70,11 +85,16 @@ jobs:
           debug: true
           proxy_timeout: 300s
           timeout: 300s
-      
-      - name: Restart PM2 process
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.LIGHTSAIL_HOST }}
-          username: ${{env.LIGHTSAIL_USERNAME}}
-          key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          script: pm2 restart app
+
+
+      - name: Remove Github Actions IP From Security Group
+        run: |
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+
+      # - name: Restart PM2 process
+      #   uses: appleboy/ssh-action@master
+      #   with:
+      #     host: ${{ secrets.LIGHTSAIL_HOST }}
+      #     username: ${{env.LIGHTSAIL_USERNAME}}
+      #     key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+      #     script: pm2 restart app

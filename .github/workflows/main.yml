@@ -57,7 +57,8 @@ jobs:
           strip_components: 1
           target: '/home/ec2-user/0sunmanserver/'
           debug: true
-          proxy_timeout: 60
+          proxy_timeout: 60s
+          timeout: 60s
       
       - name: Restart PM2 process
         uses: appleboy/ssh-action@master

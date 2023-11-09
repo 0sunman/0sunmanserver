@@ -1,100 +1,39 @@
-name: CI CD
+# This is a basic workflow to help you get started with Actions
+
+name: CI
 
 on:
   push:
-    branches: ['main']
-  pull_request:
-    branches: ['main']
+    branches: [main]
 
-env:
-  LIGHTSAIL_SSH_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-  LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
-  LIGHTSAIL_USERNAME: ec2-user
-  AWS_REGION: ap-northeast-2
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on : ubuntu-latest
+    runs-on: ubuntu-latest
+
     steps:
-      - name: 해당 브런치로 체크아웃
-        uses: actions/checkout@v2
-  
-      # nodeJs를 설치합니다.
-      - name: 노드 설치
-        uses: actions/setup-node@v4.0.0
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: checkout release
+        uses: actions/checkout@v3
 
-      # package.json의 dependencies 설치
-      - name: 프로젝트 디펜던시 설치
-        run: yarn
+      - name: compress
+        run: tar cvfz ./$GITHUB_SHA.tar.gz *
+        shell: bash
 
-      # 프로젝트를 빌드합니다.
-      - name: 프로젝트 빌드하기
-        run: yarn build
-
-      # 빌드 파일이 생성되었는지 확인합니다.
-      - name: 빌드 파일 생성 체크
-        run: ls -la
-
-      - name: AWS 인증하기
+      - name: AWS configure credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-region: ${{ env.AWS_REGION }}
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      # 빌드 파일이 생성되었는지 확인합니다.
-      - name: 빌드 파일 생성 체크2
-        run: ls dist
-
-      - name: AWS 인증하기
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-region: ${{ env.AWS_REGION }}
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}    
-
-      - name: Get Github Actions IP
-        id: ip
-        uses: haythem/public-ip@v1.2
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: ap-northeast-2
 
-      - name: Add Github Actions IP to Security group
-        run: |
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+      - name: upload to S3
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.tar.gz s3://[본인의버킷이름]
 
-      # AWS 인증이 완료되었는지 테스트합니다.
-      - name: AWS Lightsail에 연결되었는지 확인
-        run: aws configure list
-
-      # 배포 자동화를 시작합니다.
-      - name: 배포 자동화
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.LIGHTSAIL_HOST }}
-          username: ${{env.LIGHTSAIL_USERNAME}}
-          key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          source: 'dist/*'
-          strip_components: 1
-          target: '/home/ec2-user/0sunmanserver/dist'
-          debug: true
-          proxy_timeout: 300s
-          timeout: 300s
-
-
-      - name: Remove Github Actions IP From Security Group
-        run: |
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
-
-      # - name: Restart PM2 process
-      #   uses: appleboy/ssh-action@master
-      #   with:
-      #     host: ${{ secrets.LIGHTSAIL_HOST }}
-      #     username: ${{env.LIGHTSAIL_USERNAME}}
-      #     key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-      #     script: pm2 restart app
+      - name: deploy with AWS codeDeploy
+        run: aws deploy create-deployment
+          --application-name 0sunma-codedeploy-app
+          --deployment-config-name CodeDeployDefault.OneAtATime
+          --deployment-group-name 0sunmanserver
+          --s3-location bucket=0sunmanserver-codedeploy-bucket,bundleType=tgz,key=$GITHUB_SHA.tar.gz

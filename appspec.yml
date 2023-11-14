@@ -5,18 +5,14 @@ files:
     destination: /home/ec2-user/build/
 hooks:
   BeforeInstall:
-      - location: scripts/beforeinstall.sh
-        timeout: 300
-        runas: root
+    - location: scripts/beforeinstall.sh
+      timeout: 300
   AfterInstall:
     - location: scripts/afterinstall.sh
       timeout: 300
-      runas: root
   ApplicationStart:
     - location: scripts/applicationstart.sh
       timeout: 300
-      runas: root
   ApplicationStop:
     - location: scripts/applicationstop.sh
       timeout: 300
-      runas: root

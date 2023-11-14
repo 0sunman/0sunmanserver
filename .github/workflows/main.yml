@@ -33,7 +33,7 @@ jobs:
 
       - name: deploy with AWS codeDeploy
         run: aws deploy create-deployment
-          --application-name 0sunma-codedeploy-app
+          --application-name 0sunman-codedeploy-2-app
           --deployment-config-name CodeDeployDefault.OneAtATime
-          --deployment-group-name 0sunmanserver
+          --deployment-group-name 0sunman-codedeploy-2
           --s3-location bucket=0sunmanserver-codedeploy-bucket,bundleType=tgz,key=$GITHUB_SHA.tar.gz

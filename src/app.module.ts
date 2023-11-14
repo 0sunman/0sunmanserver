@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ContentModule } from './content/content.module';
 
 @Module({
-  imports: [ContentModule],
+  // imports: [ContentModule],
   controllers: [AppController],
   providers: [AppService],
 })

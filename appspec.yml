@@ -1,4 +1,4 @@
-version: 0.1
+version: 0.0
 os: linux
 files:
   - source: /
@@ -6,13 +6,4 @@ files:
 hooks:
   BeforeInstall:
     - location: scripts/beforeinstall.sh
-      timeout: 300
-  AfterInstall:
-    - location: scripts/afterinstall.sh
-      timeout: 300
-  ApplicationStart:
-    - location: scripts/applicationstart.sh
-      timeout: 300
-  ApplicationStop:
-    - location: scripts/applicationstop.sh
       timeout: 300

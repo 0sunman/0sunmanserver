@@ -28,7 +28,7 @@ export class ContentService {
   }
 
   remove(id: number) {
-    this.contentRepository.softDelete({"id":id});
+    this.contentRepository.delete({"id":id});
     return `This action removes a #${id} content`;
   }
 }

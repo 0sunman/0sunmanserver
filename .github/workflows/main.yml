@@ -24,6 +24,7 @@ jobs:
           echo -e 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}' >> env
           echo DB_PORT=${{ secrets.DB_PORT }} >> env
           echo DB_USER=${{ secrets.DB_USER }} >> env
+          cat env
         shell: bash
           
       - name: compress

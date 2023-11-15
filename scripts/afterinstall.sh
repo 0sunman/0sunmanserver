@@ -1,4 +1,5 @@
 cd /home/ec2-user/build
+sudo mv env .env
 sudo npm install
 sudo npm run build
 sudo pm2 kill

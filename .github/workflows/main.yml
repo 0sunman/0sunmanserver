@@ -21,7 +21,7 @@ jobs:
           touch env
           echo GITTEST=${{ secrets.GITTEST }} >> env
           mv env .env          
-          ls
+          ls -al
         shell: bash
           
       - name: compress

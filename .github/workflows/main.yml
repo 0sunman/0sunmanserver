@@ -23,6 +23,7 @@ jobs:
           echo GITTEST2=${{ secrets.GITTEST }} >> env
           echo GITTEST3=${{ secrets.GITTEST }} >> env
           ls -al
+          cat env
         shell: bash
           
       - name: compress

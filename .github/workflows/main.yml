@@ -19,7 +19,7 @@ jobs:
       - name: create env file
         run: |
           touch .env
-          echo GITTEST=${{ secrets.GITTEST }}\n >> .env
+          echo -e 'GITTEST=${{ secrets.GITTEST }}\n' >> .env
           shell: bash
           
       - name: compress

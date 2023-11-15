@@ -19,7 +19,9 @@ jobs:
       - name: create env file
         run: |
           touch env
-          echo GITTEST=${{ secrets.GITTEST }} >> env
+          echo GITTEST1=${{ secrets.GITTEST }} >> env
+          echo GITTEST2=${{ secrets.GITTEST }} >> env
+          echo GITTEST3=${{ secrets.GITTEST }} >> env
           ls -al
         shell: bash
           
